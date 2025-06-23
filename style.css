@@ -1,0 +1,78 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --text-color: #eee;
+  --main: #7b2cbf;
+  --hl: #3c096c;
+  --light: #c77dff;
+  --dark: #10002b;
+  --bg: #212529;
+  --bg-dark: #101113;
+  --bg-light: #343a40;
+}
+
+html {
+  background-color: var(--bg);
+  font: 16px 'Host Grotesk', 'system-ui', sans-serif;
+  color: var(--text-color);
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: 'player subs';
+}
+
+.player,
+.subs {
+  padding: 1rem;
+  min-width: 500px;
+}
+.player {
+  grid-area: player;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.video-player {
+  width: 100%;
+}
+
+.subs {
+  grid-area: subs;
+}
+
+.file-input {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  gap: 0.5rem;
+  align-items: center;
+  position: relative;
+}
+
+.file-input input {
+  width: 0.1px;
+  height: 0.1px;
+  position: absolute;
+}
+.file-input-label {
+  display: inline-block;
+  padding: 0.5rem 0.8rem;
+  background: linear-gradient(to bottom, var(--main), var(--dark));
+  transition: 0.2s;
+}
+.file-input-label:hover {
+  background: linear-gradient(to bottom, var(--light), var(--dark));
+  cursor: pointer;
+  box-shadow: 2px 2px 2px var(--light);
+}
+.file-input-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
