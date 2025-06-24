@@ -21,6 +21,10 @@ html {
   color: var(--text-color);
 }
 
+ul {
+  list-style: none;
+}
+
 #app {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -44,6 +48,9 @@ html {
 
 .subs {
   grid-area: subs;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .file-input {
@@ -75,4 +82,27 @@ html {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* SUBS */
+.sub-group-list {
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.3rem; */
+}
+.sub-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  border-bottom: 1px solid var(--main);
+  /* padding-bottom: 0.3rem; */
+}
+.sub-group-ts {
+  background-color: var(--dark);
+  padding: 0.56rem;
+  display: flex;
+  align-items: center;
+}
+.sub-group-text {
+  padding: 0.5rem 0.5rem 0.5rem 0;
 }
