@@ -85,17 +85,26 @@ ul {
 }
 
 /* SUBS */
+.subs-timeline {
+  max-height: 80vh;
+  overflow-y: scroll;
+  scrollbar-color: var(--main) transparent;
+}
+
 .sub-group-list {
   display: flex;
   flex-direction: column;
-  /* gap: 0.3rem; */
 }
 .sub-group {
   display: flex;
   gap: 0.5rem;
   align-items: stretch;
   border-bottom: 1px solid var(--main);
-  /* padding-bottom: 0.3rem; */
+  transition: all 0.2s ease-in-out;
+}
+.sub-group:hover {
+  cursor: pointer;
+  background-color: var(--bg-dark);
 }
 .sub-group-ts {
   background-color: var(--dark);

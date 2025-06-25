@@ -14,7 +14,24 @@ inputGroups.forEach(ig => {
 });
 
 const videoInput = document.getElementById('video-file-input');
-// TODO:
+const videoPlayer = document.getElementById('video-player');
+let videoLoaded = false;
+videoInput.addEventListener('change', e => {
+  const { files } = e.target;
+  if (files.length > 0) {
+    const file = files[0];
+    const videoUrl = URL.createObjectURL(file);
+    videoPlayer.src = videoUrl;
+  }
+});
+
+videoPlayer.addEventListener('loadedmetadata', () => {
+  videoLoaded = true;
+});
+
+videoPlayer.addEventListener('timeupdate', () => {
+  console.log(videoPlayer.currentTime);
+});
 
 const subsInput = document.getElementById('subs-input');
 const subsTimeline = document.getElementById('subs-timeline');
@@ -63,6 +80,20 @@ function renderSubs() {
   const subNodes = subGroups.map(createSubGroupNode);
   ul.append(...subNodes);
 
+  ul.addEventListener('click', e => {
+    if (e.target === e.currentTarget) return;
+
+    let childNode = e.target;
+    while (childNode.parentNode !== e.currentTarget) {
+      childNode = childNode.parentNode;
+    }
+
+    const gotoTimestamp = childNode.dataset['timestampSec'];
+    if (gotoTimestamp && videoLoaded) {
+      videoPlayer.currentTime = parseFloat(gotoTimestamp);
+    }
+  });
+
   removeChildNodes(subsTimeline);
   subsTimeline.appendChild(ul);
 }
@@ -70,6 +101,7 @@ function renderSubs() {
 function createSubGroupNode(sg) {
   const li = document.createElement('li');
   li.classList.add('sub-group');
+  li.dataset['timestampSec'] = getTimestampInSeconds(sg.timestamp.begin);
 
   const timestamp = document.createElement('p');
   timestamp.classList.add('sub-group-ts');
@@ -94,14 +126,29 @@ function removeChildNodes(container) {
   }
 }
 
+function getTimestampInSeconds(ts) {
+  const [main, msStr] = ts.split('.');
+  const [hStr, mStr, sStr] = main.split(':');
+
+  const [h, m, s, ms] = [
+    parseInt(hStr),
+    parseInt(mStr),
+    parseInt(sStr),
+    parseInt(msStr),
+  ];
+  console.log(h, m, s, ms);
+
+  return h * 60 * 60 + m * 60 + s + ms / 100;
+}
+
 class SubGroup {
   constructor(number, timestampRaw, content) {
     this.number = number;
-    this.timestamp = this.parseTimestamp(timestampRaw);
+    this.timestamp = this.parseTimestamps(timestampRaw);
     this.content = content;
   }
 
-  parseTimestamp(ts) {
+  parseTimestamps(ts) {
     const tsParts = ts.split(' ');
     if (tsParts.length !== 3) {
       console.error(`Wrong timestamp format, expected 3 parts, got "${ts}"`);
@@ -113,6 +160,14 @@ class SubGroup {
       );
       return;
     }
-    return { begin: tsParts[0], end: tsParts[1] };
+
+    const begin = this.formatTimestamp(tsParts[0]);
+    const end = this.formatTimestamp(tsParts[2]);
+    return { begin, end };
+  }
+
+  formatTimestamp(ts) {
+    const [sec, ms] = ts.split(',');
+    return `${sec}.${ms.slice(0, 2)}`;
   }
 }
