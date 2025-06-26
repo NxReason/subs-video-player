@@ -22,6 +22,7 @@ videoInput.addEventListener('change', e => {
     const file = files[0];
     const videoUrl = URL.createObjectURL(file);
     videoPlayer.src = videoUrl;
+    videoPlayer.volume = 0.5;
   }
 });
 
@@ -30,8 +31,34 @@ videoPlayer.addEventListener('loadedmetadata', () => {
 });
 
 videoPlayer.addEventListener('timeupdate', () => {
-  console.log(videoPlayer.currentTime);
+  let currentSub = bSearchSubGroupByTime(videoPlayer.currentTime);
+  if (currentSub) {
+    highlightSubgroup(currentSub.node);
+    currentSub.node.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
 });
+
+function bSearchSubGroupByTime(time) {
+  let start = 0;
+  let end = subGroups.length;
+  let found = false;
+  let middle;
+
+  while (!found && start < end) {
+    middle = Math.floor((start + end) / 2);
+    const sg = subGroups[middle];
+
+    if (sg.timestampSec.begin > time) {
+      end = middle;
+    } else if (sg.timestampSec.end < time) {
+      start = middle + 1;
+    } else if (sg.timestampSec.begin < time && sg.timestampSec.end > time) {
+      found = true;
+    }
+  }
+
+  return found ? subGroups[middle] : null;
+}
 
 const subsInput = document.getElementById('subs-input');
 const subsTimeline = document.getElementById('subs-timeline');
@@ -72,6 +99,7 @@ function parseSubs(text) {
 
     subGroupData.push(line.trim());
   }
+  // TODO: sort sub groups by timestamp
 }
 
 function renderSubs() {
@@ -101,7 +129,8 @@ function renderSubs() {
 function createSubGroupNode(sg) {
   const li = document.createElement('li');
   li.classList.add('sub-group');
-  li.dataset['timestampSec'] = getTimestampInSeconds(sg.timestamp.begin);
+  li.dataset['timestampSec'] = sg.timestampSec.begin;
+  sg.node = li;
 
   const timestamp = document.createElement('p');
   timestamp.classList.add('sub-group-ts');
@@ -136,15 +165,27 @@ function getTimestampInSeconds(ts) {
     parseInt(sStr),
     parseInt(msStr),
   ];
-  console.log(h, m, s, ms);
 
   return h * 60 * 60 + m * 60 + s + ms / 100;
+}
+
+let currentHighlight = null;
+function highlightSubgroup(node) {
+  if (node && currentHighlight != node) {
+    currentHighlight?.classList.remove('hl');
+    node.classList.add('hl');
+    currentHighlight = node;
+  }
 }
 
 class SubGroup {
   constructor(number, timestampRaw, content) {
     this.number = number;
     this.timestamp = this.parseTimestamps(timestampRaw);
+    this.timestampSec = {
+      begin: getTimestampInSeconds(this.timestamp.begin),
+      end: getTimestampInSeconds(this.timestamp.end),
+    };
     this.content = content;
   }
 

@@ -102,6 +102,9 @@ ul {
   border-bottom: 1px solid var(--main);
   transition: all 0.2s ease-in-out;
 }
+.sub-group.hl {
+  background-color: var(--hl);
+}
 .sub-group:hover {
   cursor: pointer;
   background-color: var(--bg-dark);
