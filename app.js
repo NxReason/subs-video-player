@@ -41,10 +41,9 @@ videoPlayer.addEventListener('timeupdate', () => {
 function bSearchSubGroupByTime(time) {
   let start = 0;
   let end = subGroups.length;
-  let found = false;
   let middle;
 
-  while (!found && start < end) {
+  while (start < end) {
     middle = Math.floor((start + end) / 2);
     const sg = subGroups[middle];
 
@@ -52,12 +51,12 @@ function bSearchSubGroupByTime(time) {
       end = middle;
     } else if (sg.timestampSec.end < time) {
       start = middle + 1;
-    } else if (sg.timestampSec.begin < time && sg.timestampSec.end > time) {
-      found = true;
+    } else if (sg.timestampSec.begin <= time && sg.timestampSec.end >= time) {
+      return subGroups[middle];
     }
   }
 
-  return found ? subGroups[middle] : null;
+  return null;
 }
 
 const subsInput = document.getElementById('subs-input');
